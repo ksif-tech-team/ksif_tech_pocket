@@ -36,6 +36,14 @@ Pocket 은 다음과 같은 기능을 제공합니다.
    analyzer.summarize(start, end) # Analyzing Basic Statistics from "start" to "end"
   ```
 
+
+# Implementation Todos
+
+1. Abstraction - Pocket
+2. Data Fetching - Google Drive
+3. API Implementation
+
+
 # API Description
 
 ### Ordering
@@ -54,5 +62,6 @@ Pocket 은 다음과 같은 기능을 제공합니다.
 
 * viewing 
   * View() - transaction, balance system for quant
+  
 
 
