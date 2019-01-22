@@ -23,18 +23,29 @@ class Pocket():
         self.logs = False
 
     def order(self, stocks, amount=0, date=datetime.today()):
-        if isinstance(stocks, type("")):
-            # order single stocks with amount
-            # 1. modify cur_stocks
-            # 2. add new record into history
-            pass
-        elif isinstance(stocks, type({})):
-            # order multiple stocks with key and value from given dictionary
-            pass
+        # Set cur_stocks and Add new record to history
+        self.set_cur_stocks(stocks, amount, date)
+        new_record = Record(date, stocks)
+        self.history.append(new_record)
 
         if self.logs:
             print("Order Complete!")
         return 1
+
+    def set_one_stock(self, stock, amount, date):
+        # buy or sell unit stock
+        pass
+
+    def set_cur_stocks(self, stocks, amount, date):
+        if isinstance(stocks, type("")):
+            # check difference between selling buying
+            self.set_unit_stock(stocks, amount, date)
+        elif isinstance(stocks, type({})):
+            # order multiple stocks with key and value from given dictionary
+            for stock, amount in stocks.items():
+                self.set_unit_stock(stock,amount)
+
+
 
     def analyze(self, start, end):
         """
