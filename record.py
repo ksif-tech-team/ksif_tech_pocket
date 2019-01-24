@@ -22,7 +22,8 @@ class Record():
 
 
     def __str__(self):
-        repr_str = "{:>15} | Amount\n" \
+        repr_str = "\n" \
+                   "{:>15} | Amount\n" \
                    "=========================\n"\
 
         for code, name, amount in self.assets:

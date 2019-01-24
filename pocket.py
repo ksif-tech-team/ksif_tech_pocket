@@ -8,6 +8,7 @@ import pandas as pd
 
 from record import Record
 from datetime import datetime
+import util
 
 PRICE_DF = pd.read_csv("./PRICE.csv", index_col=[0], parse_dates=[0])
 
@@ -29,55 +30,69 @@ class Pocket():
         self.history = []
         self.logs = False
 
-    def _pack_record(self, date, stocks, amount):
-        if amount:
-            return Record(date, [(stocks, "Temp Stock name", amount)])
-        else:
-            return Record(date, [(stock, "Temp stock name", amount) for stock, amount in stocks.items()])
 
     def order(self, date, stocks, amount=0):
         # Set cur_stocks and Add new record to history
+        success = True
         if not date:
             raise ValueError("Date is Required")
 
-        self.set_cur_stocks(stocks, amount, date)
-        new_record = self._pack_record(date, stocks, amount)
-        self.history.append(new_record)
+        try:
+            new_record = util._pack_record(date, stocks, amount)
+            self._set_cur_stocks(stocks, amount, date)
+            self.history.append(new_record)
+        except Exception as e:
+            print("Your Order has been failed by following reason.")
+            success = False
+            print(e)
 
         if self.logs:
-            print("Order Complete!")
+            if success:
+                print(new_record)
+            else:
+                print(f"Unsuccessful Order at {date} of order{new_record}")
 
-        return True
+        return success
 
-    def set_one_stock(self, stock, amount, date):
+    def _set_one_stock(self, stock, amount, date):
         # buy or sell unit stock
         try:
             price_at_date = PRICE_DF.loc[date]
-        except ValueError as e:
+        except Exception as e:
             print(e)
-            print("Invalid Date to Order")
+            raise ValueError("Invalid Date to Order")
 
         try:
             price_of_firm = price_at_date[stock]
-        except ValueError as e:
+            if not price_of_firm:
+                raise ValueError("Ordered Stock doesn't have proper price info.")
+        except Exception as e:
             print(e)
-            print("Invalid Firm at Date")
+            raise ValueError("Ordered Stock is not available to trade.")
 
         self.cur_stocks.loc[stock] = ["Stock Name", amount, date, price_of_firm, price_of_firm * amount]
 
-    def set_cur_stocks(self, stocks, amount, date):
+    def _set_cur_stocks(self, stocks, amount, date):
         if isinstance(stocks, type("")):
             # check difference between selling buying
-            self.set_one_stock(stocks, amount, date)
+            self._set_one_stock(stocks, amount, date)
         elif isinstance(stocks, type({})):
             # order multiple stocks with key and value from given dictionary
             for stock, amount in stocks.items():
-                self.set_one_stock(stock, amount, date)
+                self._set_one_stock(stock, amount, date)
 
     def view_history(self):
         for hist in self.history:
             print(hist)
 
+    def evaluate_cur_stocks(self):
+        today = datetime.today()
+        close_val = PRICE_DF.iloc[PRICE_DF.index.get_loc(today, method="ffill")]
+        close_val = close_val[self.cur_stocks.index]
+        close_val = pd.DataFrame({"PRICE_CURRENT" : close_val.values}, index=self.cur_stocks.index)
+        self.cur_stocks = pd.merge(self.cur_stocks, close_val, left_index=True, right_index=True)
+        self.cur_stocks["VOLUME_CURRENT"] = self.cur_stocks["AMOUNT"] * self.cur_stocks["PRICE_CURRENT"]
+        self.cur_stocks["RETURN"] = (self.cur_stocks["VOLUME_CURRENT"] / self.cur_stocks["VOLUME_PURCHASE"]) - 1
 
     def analyze(self, start, end):
         """
@@ -106,12 +121,13 @@ def get_update_list(new_portfolio_dict, portfolio_dict):
 
 if __name__ == "__main__":
     pkt = Pocket(0)
+    pkt.logs = True # Activate Logging
     PRICE_DF = pd.read_csv("./PRICE.csv", index_col=[0], parse_dates=[0])
 
     pkt.order(datetime(2010, 9, 30), "A000030", 3)
-    print(pkt.cur_stocks)
 
-    sample_dict = {"A000660": 10, "A005930" : 30}
+    sample_dict = {"A000660": 10, "A00cscs" : 30}
     pkt.order(datetime(2011, 9, 30), sample_dict)
+
+    pkt.evaluate_cur_stocks()
     print(pkt.cur_stocks)
-    pkt.view_history()

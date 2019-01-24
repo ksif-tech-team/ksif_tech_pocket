@@ -99,7 +99,25 @@ Pocket 은 다음과 같은 기능을 제공합니다.
   * View() - transaction, balance system for quant
   
   
-## Practice
-* Practice
+### Example
 
+``` sdf
+Loss cut Strategy with Pocket Ordering
+pkt = Pocket()
+
+start = datetime(2010, 1, 1)
+end = datetime(2019, 1, 1)
+date_range = pd.date_range(2010, 2019)
+
+pocket.order(KOSPI, start)
+
+def losscut(date):  # Losscut strategy to perform 
+    ...
+
+for date in date_range:
+    loss_firms = losscut(date)
+    pocket.order(loss_firms)
+
+pocket.analyze()
+```
 
