@@ -42,15 +42,12 @@ class Pocket():
             self._set_cur_stocks(stocks, amount, date)
             self.history.append(new_record)
         except Exception as e:
-            print("Your Order has been failed by following reason.")
+            print("Your Order has been failed because of following reason.")
             success = False
             print(e)
 
-        if self.logs:
-            if success:
-                print(new_record)
-            else:
-                print(f"Unsuccessful Order at {date} of order{new_record}")
+        if self.logs and success:
+            print(new_record)
 
         return success
 
@@ -70,6 +67,7 @@ class Pocket():
             print(e)
             raise ValueError("Ordered Stock is not available to trade.")
 
+        # if stock already in position, how to do it??? --> Where to put cash concept in abstraction.
         self.cur_stocks.loc[stock] = ["Stock Name", amount, date, price_of_firm, price_of_firm * amount]
 
     def _set_cur_stocks(self, stocks, amount, date):
@@ -90,12 +88,13 @@ class Pocket():
         close_val = PRICE_DF.iloc[PRICE_DF.index.get_loc(today, method="ffill")]
         close_val = close_val[self.cur_stocks.index]
         close_val = pd.DataFrame({"PRICE_CURRENT" : close_val.values}, index=self.cur_stocks.index)
-        self.cur_stocks = pd.merge(self.cur_stocks, close_val, left_index=True, right_index=True)
-        self.cur_stocks["VOLUME_CURRENT"] = self.cur_stocks["AMOUNT"] * self.cur_stocks["PRICE_CURRENT"]
-        self.cur_stocks["RETURN"] = (self.cur_stocks["VOLUME_CURRENT"] / self.cur_stocks["VOLUME_PURCHASE"]) - 1
+        evaluated_stocks = pd.merge(self.cur_stocks, close_val, left_index=True, right_index=True)
+        evaluated_stocks = evaluated_stocks["AMOUNT"] * evaluated_stocks["PRICE_CURRENT"]
+        evaluated_stocks = (self.cur_stocks["VOLUME_CURRENT"] / self.cur_stocks["VOLUME_PURCHASE"]) - 1
+        return evaluated_stocks
 
     def analyze(self, start, end):
-        """
+        """ Analyzing the performance of manager's pocket.
         :param start:   (datetime) Datetime starting analyzing date
         :param end:     (datetime) Datetime ending analyzing date
         :return:        (DataFrame) Dataframe that contain summary statistics
@@ -126,8 +125,12 @@ if __name__ == "__main__":
 
     pkt.order(datetime(2010, 9, 30), "A000030", 3)
 
-    sample_dict = {"A000660": 10, "A00cscs" : 30}
+    sample_dict = {"A000660": 10}
     pkt.order(datetime(2011, 9, 30), sample_dict)
 
-    pkt.evaluate_cur_stocks()
+    print(pkt.cur_stocks)
+
+    sample_dict = {"A000660": 1}
+    pkt.order(datetime(2012, 9, 28), sample_dict)
+    print(pkt.evaluate_cur_stocks())
     print(pkt.cur_stocks)
