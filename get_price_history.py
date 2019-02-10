@@ -41,14 +41,14 @@ def get_code():
 
 # Get price histroy of the firm
 def get_a_price(code, source, start, end):
-    print(type(code))
+    # print(type(code))
     return pdr.DataReader(code + ".KS", source, start, end)
 
 # Get all price histories listed
 def get_prices(code_list, source, start, end):
     results = {}
     for code in code_list:
-        print(type(code), "=", code)
+        # print(type(code), "=", code)
         results[code] = get_a_price('001040', source, start, end)
 
     return results
@@ -61,10 +61,13 @@ def get_prices(code_list, source, start, end):
 code_df = pd.DataFrame(get_code())
 
 code_list = list((get_code()).code)
+print(len(code_list))
+print(code_list[:10])
 # code_list = ['001040','081150','013720']
 
 source = 'yahoo'
 start = '2019-01-15'
 end = dt.now().strftime('%Y-%m-%d')
 
-price_df = get_prices(code_list, source, start, end)
+price_df = get_prices(code_list[:10], source, start, end)
+print(price_df)
