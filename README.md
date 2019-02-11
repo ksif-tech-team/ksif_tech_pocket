@@ -5,41 +5,7 @@
 Pocket 은 Quant 투자 과정에서 거래기록, 잔액을 기록하는 시스템입니다
 
 Pocket 은 다음과 같은 기능을 제공합니다.
-* Organize_portfolio
-  * 구성해야 할 포트폴리오 정보를 받아 Ordering, Logging을 수행합니다.
-    * Organize new portfolio
-        1. 백테스팅 시작시
-        2. 예산이 추가되는 경우(?)
-        3. 복수의 자산운용전략을 종합적으로 분석하는 경우 
-    * Update previous portfolio
-        1. 리밸런싱
-        * get_update_list 
-            1. From new_portfolio_list and (previous)portfolio_list get update_list
-            ```
-            # From
-            new_portfolio_dict = {"Strategy" : 0001, "A000120" : 50, "A009340" : 100, "A349400" : 1000}
-            (previous)portfolio_dict = {"A000120" : 10, "A009340" : 150}
-            
-            # Get
-            update_stock_list = ["A000120", -10, 39000, -390000, 138, 'add'] 
-                # [Stock_code, quantity, price, Transaction volume, Transaction cost, state]
-                # the state is in ['add'(추가 매수), 'sell'(매도), 'enterance'(신규 진입), 'clear'정리(전량 매도)]
-            update_portfolio_list = [Time, list1, list2, list3, ..., Transaction Volume, Transaction cost]
-                # [Transaction time, update_stock_list1, update_stock_list2, ..., Total volume, Total transaction cost]
-            ```
-     
-       
-  
-  setting 합니다. 운용 전략에 맞는 포트폴리오 구성 정보를 넘겨받아 필요에 따라 매수 및 매도 주문을 수행합니다.
-  ```
-  status = 'update' # 'new' - Organize new portfolio / 'update' - Rebalance portfolio
-    # (previous) portfolio_dict = {"A000120" : 10, "A009340" : 150}
-  portfolio_dict = {"A000120" : 50, "A009340" : 100, "A349400" : 1000}
-  set_portfolio(portfolio_dict) # 변경된 포트폴리오를 구성하기 위한 주문을 분석하고 기록한다
-    # Order_dict = {"A000120" : 40, "A009340" : -50, "A349400" : 1000}
-    # Ordering(Orering_dict)
-    # append(log) = (Time, ("stock_code", price(per), quantity, status(New, Quit, Add, Subtract)),...)
-  ```
+
 * Ordering 
   * Ordering 은 주식을 주문하는 기능입니다. 개별 주식 단순 주문 뿐만 아니라 여러 주식을 동시에 주문하거나 주식 계정 리밸런싱 기능까지 제공합니다.
   ```
@@ -128,3 +94,40 @@ pocket.analyze()
   * 예산이 추가된 시점 이후 같은 수익률 공유 - 분리 가능
   * 이를 응용해 각 리밸런싱의 수익률 추출 가능 
 
+
+## 광현
+* Organize_portfolio
+  * 구성해야 할 포트폴리오 정보를 받아 Ordering, Logging을 수행합니다.
+    * Organize new portfolio
+        1. 백테스팅 시작시
+        2. 예산이 추가되는 경우(?)
+        3. 복수의 자산운용전략을 종합적으로 분석하는 경우 
+    * Update previous portfolio
+        1. 리밸런싱
+        * get_update_list 
+            1. From new_portfolio_list and (previous)portfolio_list get update_list
+            ```
+            # From
+            new_portfolio_dict = {"Strategy" : 0001, "A000120" : 50, "A009340" : 100, "A349400" : 1000}
+            (previous)portfolio_dict = {"A000120" : 10, "A009340" : 150}
+            
+            # Get
+            update_stock_list = ["A000120", -10, 39000, -390000, 138, 'add'] 
+                # [Stock_code, quantity, price, Transaction volume, Transaction cost, state]
+                # the state is in ['add'(추가 매수), 'sell'(매도), 'enterance'(신규 진입), 'clear'정리(전량 매도)]
+            update_portfolio_list = [Time, list1, list2, list3, ..., Transaction Volume, Transaction cost]
+                # [Transaction time, update_stock_list1, update_stock_list2, ..., Total volume, Total transaction cost]
+            ```
+     
+       
+  
+  setting 합니다. 운용 전략에 맞는 포트폴리오 구성 정보를 넘겨받아 필요에 따라 매수 및 매도 주문을 수행합니다.
+  ```
+  status = 'update' # 'new' - Organize new portfolio / 'update' - Rebalance portfolio
+    # (previous) portfolio_dict = {"A000120" : 10, "A009340" : 150}
+  portfolio_dict = {"A000120" : 50, "A009340" : 100, "A349400" : 1000}
+  set_portfolio(portfolio_dict) # 변경된 포트폴리오를 구성하기 위한 주문을 분석하고 기록한다
+    # Order_dict = {"A000120" : 40, "A009340" : -50, "A349400" : 1000}
+    # Ordering(Orering_dict)
+    # append(log) = (Time, ("stock_code", price(per), quantity, status(New, Quit, Add, Subtract)),...)
+  ```
