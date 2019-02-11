@@ -47,6 +47,7 @@ def get_code():
 def get_a_price(start, end, code, source):
     return pdr.DataReader(code , source, start, end)
 
+
 # Get all price histories listed
 def get_prices(start, end="dt.now().strftime('%Y-%m-%d')", code_list='all', source='yahoo'):
     """
@@ -61,6 +62,7 @@ def get_prices(start, end="dt.now().strftime('%Y-%m-%d')", code_list='all', sour
         results[code] = get_a_price(start, end, code, source)
     df = pd.concat(results, axis=1)
 
+
     return df
 
 
@@ -70,10 +72,14 @@ def get_prices(start, end="dt.now().strftime('%Y-%m-%d')", code_list='all', sour
 code_df = pd.DataFrame(get_code())
 
 code_list = list((get_code()).code)
+print(len(code_list))
+print(code_list[:10])
 # code_list = ['001040','081150','013720']
 
 source = 'yahoo'
 start = '2019-01-15'
 end = dt.now().strftime('%Y-%m-%d')
 
-price_df = get_prices(start, code_list=code_list)
+
+price_df = get_prices(code_list[:10], source, start, end)
+print(price_df)
